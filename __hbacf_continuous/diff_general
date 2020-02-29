@@ -1,0 +1,404 @@
+1,12c1,13
+< !2015/10/17
+< !===================================================
+< !For ONE pair of molecules，we can obtain
+< !C_HB(t),C_d_HB(t):
+< !      
+< !   C_{HB}(t)= <h(0)h(t)>/<h>
+< !   C^(d)_{HB}(t)= <h(0)h^(d)(t)>/<h>
+< !===================================================
+< !We can implementate these correlation functions by
+< !calculate the average over N pairs of molecules. 
+< !===================================================      
+< ! input file: input
+---
+>      !2015/-/-
+>      !===================================================
+>      !For ONE pair of molecules，we can obtain C_HB(t):
+>      !   C_{HB}(t)= <h(0)h(t)>/<h>
+>      !===================================================
+>      !1)We can implementate these correlation functions by
+>      !calculate the average over N pairs of molecules. 
+>      !2)For any time step, instead of the original time 
+>      ! step.      
+>      !3) PBC is not considered (ONLY For comaparison, but
+>      ! for calculation !!)
+>      !===================================================      
+>      ! input file: input
+19,20c20,22
+< !===================================================
+<       program hbacf_C_d_function
+---
+>      ! the new time step, or ns
+>      !=======================================
+>       program hbacf_C_function
+22,24c24,26
+< !==========
+< !parameters
+< !==========
+---
+>      !==========
+>      !parameters
+>      !==========
+27c29,32
+<       real(kind=rk),parameter :: rate=0.50        ! condition for cutting off autocorrelation functions
+---
+>       real(kind=rk),parameter :: a=31.00        ! condition for cutting off autocorrelation functions
+>       real(kind=rk),parameter :: b=15.64       ! condition for cutting off autocorrelation functions
+>       real(kind=rk),parameter :: c=15.64       ! condition for cutting off autocorrelation functions
+>       real(kind=rk),parameter :: rate=0.80        ! condition for cutting off autocorrelation functions
+31,33c36,39
+<       real(kind=rk),parameter :: h_min=0.5 ! condition for h=1
+<       real(kind=rk),parameter :: hb_min=0.00001 ! condition for the existence of h-bond
+<       real(kind=rk),parameter :: delta_t=0.0005   ! fs
+---
+>       real(kind=rk),parameter :: h_min=0.5 ! condition for the existence of a h-bond for a step
+>       real(kind=rk),parameter :: hb_min=0.5 ! condition for the existence of h-bond for a pair of water molecules
+> 
+> 
+35c41,42
+<                                  tot_hb,hh_d
+---
+>                                  tot_hb,delta_t,delta_t0
+>       REAL(KIND=rk) :: distance2,diff_axis
+37,40c44,47
+<                  i,j,k,jj,nmo,nat,iatom,&
+<                  imovie,np,m1,m2,m3,mt,m 
+<       real(kind=rk),allocatable,dimension (:)    :: h
+<       real(kind=rk),allocatable,dimension (:)    :: hb
+---
+>                  i,j,k,jj,nmo,nat,iatom,& 
+>                  imovie,np,m1,m2,m3,mt,&
+>                  nqj,tot_nhb,n_bonded_pairs,ns 
+>       real(kind=rk),allocatable,dimension (:)    :: h,hb,corr_h
+42,46c49,54
+<       character(LEN=3)  :: atom_type  ! we are not interested in the atom type in this calculation,
+<                                       ! thus I do not use allocatable array for it.
+<       integer,allocatable,dimension(:)           :: ndx_1, ndx_2, ndx_3
+<       real(kind=rk),allocatable,dimension (:)    :: corr_h_d
+<       real(kind=rk)  :: scalar_h_d 
+---
+>       character(LEN=3)  :: atom_type    ! we are not interested in the atom type in this calculation,
+>                                         ! thus I do not use allocatable array for it.
+>       integer,allocatable,dimension(:)           :: ndx_1,ndx_2,ndx_3,&
+>           nhb_exist
+>       real(kind=rk)  :: scalar 
+>       logical,allocatable,dimension (:)  :: hb_exist
+48,50c56,60
+< !==================
+< !read data in input
+< !==================
+---
+>      !==================
+>      !read data in input
+>      !==================
+>       write(6,*)'What is the time step in the traj. file (ps):'
+>       read(5,*)delta_t0
+58c68
+<       read(5,*)nmo     !number of movie steps
+---
+>       read(5,*)nmo    ! number of movie steps
+60c70
+<       read(5,*)nat     !number of atoms per mole.
+---
+>       read(5,*)nat    ! number of atoms per mole.
+62c72,74
+<       read(5,*)np      !number of pairs   
+---
+>       read(5,*)np     ! number of pairs   
+>       write(6,*)'What is the time step for calculating CORRELATION:' 
+>       read(5,*)ns     ! [ns*0.0005] ps is the new time step for calculating correl func.
+63a76
+>       list_filename=trim(list_filename)
+67d79
+<       list_filename=trim(list_filename)
+73a86,87
+>       delta_t=ns*delta_t0    ! unit: ps
+>       nmo=nmo/ns    ! Length of the correl. function 
+78,82c92,96
+<       allocate(h_d(nmo))
+<       allocate(hb(np))!Average H-bonded population 
+< !=======================
+< !read in trajectory file 
+< !=======================
+---
+>       allocate(hb(np))    ! Average H-bonded population 
+>       allocate(nhb_exist(np))
+>      !=======================
+>      !read in trajectory file 
+>      !=======================
+85c99
+<          read(10,*)!Neglect data of this line
+---
+>          read(10,*)    !Neglect data of this line
+90a105,107
+>          do i=1, (nat+2)*(ns-1)
+>              read(10,*)
+>          enddo
+93,106c110,124
+<       write(6,*) 'End of trajectory reading.'
+< !===================================
+< !Calculate autocorrelation function
+< !===================================
+< ! calculate <h(0)h_d(t)>/<h> and 
+< ! calculate <h(0)H_d(t)>/<h> 
+< ! Notice here <> is not average over
+< ! different pairs of water molecules,
+< ! but over all starting time points.
+< !===================================      
+<       allocate(corr_h_d(nmo))
+<       do i=1, nmo
+<         corr_h_d(i)=0.0
+<       enddo
+---
+>       write(6,*) 'end of trajectory reading'
+>      !====================================
+>      !Calculate autocorrelation function
+>      !====================================
+>      ! calculate <h(0)h(t)>/<h>  
+>      ! Notice here <> is not average over
+>      ! different pairs of water molecules,
+>      ! and over all starting time points i
+>      ! with h(i)=1.
+>      !====================================      
+>       allocate(corr_h(nmo))
+>       allocate(hb_exist(nmo))
+>       ! loop
+>       corr_h(:)=0.0
+>       
+108,111c126,133
+<       do k=1,np
+<           hb(k)=0.0
+<       enddo
+< 
+---
+>       tot_nhb=0
+>       
+>       ! loop
+>       hb(:)=0.0
+>       nhb_exist(:)=0
+>      !=============
+>      !The main loop
+>      !=============      
+113a136
+>         nqj=0
+117c140
+<         !calculate h(j)
+---
+>         ! Calculate h(j)
+119,133c142,155
+<           r13= (x(m1,jj)-x(m3,jj))**2+       &
+<                     (y(m1,jj)-y(m3,jj))**2+  &
+<                     (z(m1,jj)-z(m3,jj))**2!r12,r13,r23:square of distances
+<           r12= (x(m1,jj)-x(m2,jj))**2+       &
+<                     (y(m1,jj)-y(m2,jj))**2+  &
+<                     (z(m1,jj)-z(m2,jj))**2
+<           r23= (x(m2,jj)-x(m3,jj))**2+       &
+<                     (y(m2,jj)-y(m3,jj))**2+  &
+<                     (z(m2,jj)-z(m3,jj))**2
+<           pm= (x(m3,jj)-x(m2,jj))*           &
+<                    (x(m1,jj)-x(m2,jj))+      & 
+<                    (y(m3,jj)-y(m2,jj))*      & 
+<                    (y(m1,jj)-y(m2,jj))+      & 
+<                    (z(m3,jj)-z(m2,jj))*      &
+<                    (z(m1,jj)-z(m2,jj))!pm: point multiplication. 
+---
+>           h(jj)=0.0
+>           hb_exist(jj)=.False.
+>           r13 = distance2(x(m1,jj),y(m1,jj),z(m1,jj), &
+>                           x(m3,jj),y(m3,jj),z(m3,jj),a,b,c)! r12,r13,r23:square of distances 
+>           r12 = distance2(x(m1,jj),y(m1,jj),z(m1,jj), &
+>                           x(m2,jj),y(m2,jj),z(m2,jj),a,b,c)! r12,r13,r23:square of distances 
+>           r23 = distance2(x(m2,jj),y(m2,jj),z(m2,jj), &
+>                           x(m3,jj),y(m3,jj),z(m3,jj),a,b,c)! r12,r13,r23:square of distances 
+>           pm= diff_axis(x(m3,jj),x(m2,jj),a)*           &
+>                    diff_axis(x(m1,jj),x(m2,jj),a)+      & 
+>                    diff_axis(y(m3,jj),y(m2,jj),b)*      & 
+>                    diff_axis(y(m1,jj),y(m2,jj),b)+      & 
+>                    diff_axis(z(m3,jj),z(m2,jj),c)*      &
+>                    diff_axis(z(m1,jj),z(m2,jj),c)       ! pm: point multiplication. 
+135,136c157,158
+<           if (r13 .lt. rohc .and. r12 .lt. rooc &
+<               .and. cosphi < cosphic) then    
+---
+>           if (r13 .lt. rohc .and. r12 .lt. rooc  & 
+>              .and. cosphi .gt. cosphic) then    
+138,145c160,162
+<               qj=qj+h(jj)                          
+<           else                            
+<               h(jj)=0.0
+<           endif
+<           if (r12 .lt. rooc) then
+<               h_d(jj)=1.0 
+<           else                            
+<               h_d(jj)=0.0
+---
+>               hb_exist(jj)=.True.
+>               qj=qj+h(jj)    ! To calculate ave population of HB over all starting points for one pair of water molecules.                          
+>               nqj=nqj+1
+148,149c165,166
+<         qj=qj/nmo!Ave of hb over all starting points for each pair 
+<         hb(k)=qj
+---
+>         hb(k)=qj 
+>         nhb_exist(k)=nqj
+151,167c168,176
+< !==================================
+< !Calcualte the correlation function
+< !==================================
+<         do mt=0,nmo-1     ! time interval
+<             if (hb(k)>hb_min) then
+<                 scalar_h_d=0.d0
+<                 do j=1, nmo-mt-1
+<                     !========================================================
+<                     !the definition of H(t): hh(j+mt)=h(j)*h(j+1)*...*h(j+mt)
+<                     do m=1,mt
+<                         if (h(j)> h_min .and. h_d(j+m)>h_min) then!if h_d(j+m)=1
+<                            !hh_d=hh_d*h_d(j+m),or
+<                            hh_d=1.0
+<                         else
+<                            hh_d=0
+<                            exit
+<                         endif    
+---
+>         tot_nhb=tot_nhb+nhb_exist(k)
+>         !==========================================
+>         !Calcualte the correlation function C_HB(t)
+>         !==========================================
+>         if (hb(k)>hb_min) then
+>             do mt=0,nmo-1    ! time interval
+>                 scalar=0.d0
+>                 do j=1,nmo-mt-1
+>                     scalar=scalar+h(j)*h(j+mt)  
+169,178c178,194
+<                     !========================================================
+<                     scalar_h_d=scalar_h_d+h(j)*h_d(j+mt)  
+<                 enddo
+<                 scalar_h_d=scalar_h_d/(nmo-mt-1)        ! C_k(t)
+<                 corr_h_d(mt+1)=corr_h_d(mt+1)+scalar_h_d    ! sum_C_k(t)
+<             endif
+<         enddo
+<       enddo! k-loop 
+<       tot_hb=tot_hb/np
+< 
+---
+>                 corr_h(mt+1)=corr_h(mt+1)+scalar    ! sum_C_k(t)
+>             enddo
+>         endif
+>       enddo    ! End of k-loop 
+>       deallocate(hb_exist,nhb_exist)
+>       !=========================================
+>       !Calculate the number of ever bonded pairs
+>       !=========================================
+>       n_bonded_pairs=0 
+>       do k=1,np
+>           if (hb(k)>hb_min) then
+>               n_bonded_pairs=n_bonded_pairs+1      
+>           endif
+>       enddo
+>       !========================
+>       !Normalization of C_HB(t)
+>       !========================
+180c196
+<           corr_h_d(mt+1)=corr_h_d(mt+1)/(np*tot_hb)  
+---
+>           corr_h(mt+1)=corr_h(mt+1)/tot_nhb   
+182,190c198,203
+< 
+<       deallocate(x,y,z)
+<       deallocate(ndx_1,ndx_2,ndx_3)          
+<   
+< !========================
+< !Write the correlation
+< !C_d_HB(t)) and S_d_HB(t)     
+< !========================
+<       open(10,file=trim(filename)//'_achbond_h_d.dat')
+---
+>       deallocate(x,y,z,ndx_1,ndx_2,ndx_3)          
+>      !======================
+>      !Write the correlation
+>      !C_HB(t)     
+>      !======================
+>       open(10,file=trim(filename)//'_hbacf_h.dat')
+192c205
+<             write(10,*)(i-1)*delta_t,corr_h_d(i)
+---
+>             write(10,*)(i-1)*delta_t,corr_h(i)
+195c208
+<                   '_achbond_h_d.dat'
+---
+>                   '_hbacf_h.dat'
+197,202c210,214
+< 
+< !================================
+< !Write the correlation
+< !ln(C_d_HB(t)) and ln(S_d_HB_d(t))     
+< !================================
+<       open(10,file=trim(filename)//'_achbond_ln_h_d.dat')
+---
+>      !===========================
+>      !Write the correlation
+>      !ln(C_HB(t))     
+>      !===========================
+>       open(10,file=trim(filename)//'_hbacf_ln_h.dat')
+204c216
+<             write(10,*)(i-1)*delta_t,log(corr_h_d(i))
+---
+>             write(10,*)(i-1)*delta_t,log(corr_h(i))
+207c219
+<                   '_achbond_ln_h_d.dat'
+---
+>                   '_hbacf_ln_h.dat'
+209,214c221,226
+< 
+< !===========
+< !Print <h> 
+< !===========      
+<       open(10,file=trim(filename)//'_average_h.dat')
+<         write(10,*) '<h>:',tot_hb
+---
+>      !===========
+>      ! Print <h>      
+>      !===========      
+>       open(10,file=trim(filename)//'_ave_h.dat')
+>         write(10,*) 'Ave. No. bonds:',tot_hb/nmo
+>         write(10,*) '<h>:',(tot_hb/nmo)/np
+216c228
+<                   '_average_h.dat'
+---
+>                   '_ave_h.dat'
+218,221c230,233
+<       deallocate (h,h_d,corr_h_d,corr_hh_d)
+< !=================
+< !Print ending time
+< !=================      
+---
+>       deallocate (h,corr_h,hb)
+>      !=======================
+>      !Print ending time point
+>      !=======================      
+224c236,257
+<       END
+---
+>       END PROGRAM
+> 
+>       !==============
+>       ! The functions 
+>       !==============
+>       REAL(KIND=4) FUNCTION direct_distance2(u1,v1,w1,u2,v2,w2)
+>           INTEGER, PARAMETER :: rk=4
+>           real(kind=rk) :: u1,v1,w1,u2,v2,w2
+>           direct_distance2 = (u2-u1)**2 + (v2-v1)**2 + (w2-w1)**2
+>       END FUNCTION direct_distance2
+> 
+>       REAL(KIND=4) FUNCTION distance2(u1,v1,w1,u2,v2,w2,a,b,c)
+>           INTEGER, PARAMETER :: rk=4
+>           real(kind=rk) :: u1,v1,w1,u2,v2,w2,a,b,c
+>               distance2= direct_distance2(u1,v1,w1,u2,v2,w2) 
+>       END FUNCTION distance2
+> 
+>       REAL(KIND=4) FUNCTION diff_axis(u1,u2,a)
+>           INTEGER, PARAMETER :: rk=4
+>           real(kind=rk) :: u1, u2, a
+>               diff_axis= u1 - u2
+>       END FUNCTION diff_axis

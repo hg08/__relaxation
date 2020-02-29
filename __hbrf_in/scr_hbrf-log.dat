@@ -1,0 +1,37 @@
+#=======
+#setting
+#=======
+load '~/bin/hbacf_template.gnuplot'
+set output "124_2LiI_rfhb_1605.eps"
+set size square 1.15, 1.5
+set multiplot
+
+#set logscale y
+set xrange [0. : 5]
+set yrange [-0.2 : 5]  
+#set xtics 1 
+#set mxtics 2
+#set ytics 2 
+#set mytics 2
+#set format y "10^{%T}" 
+set style line 1000 lt 1 lw 2 lc rgb '#000000' # Black solid
+
+# plot 1
+set origin 0, 0 
+set size 1.15, 1.5
+set key at 4.5, 1 
+# set xlabel "{/Symbol n} (cm^{-1})" 
+set border 1+2+4+8
+set xlabel "{t (ps)" font "Sans, 40"
+set ylabel "k(t) (ps^{-1})"
+f(x)=0
+#h(x) = 0.177*exp(-0.177*x)
+plot  f(x) w l ls 2 notitle,\
+     "124-2LiI_10ps_rfachbond_h.dat" u 1:2 w l ls 1 title "rate function"
+#      h(x)  w l ls 3 title "fit"
+g(x) = a*exp(-a*x)
+fit g(x) '124-2LiI_10ps_rfachbond_h.dat' u 1:2  via a 
+
+unset multiplot
+set output 
+set term wxt

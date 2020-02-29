@@ -1,0 +1,56 @@
+  441  source .bashrc
+  443  emacs .bash_profile 
+  444  cd __relaxiation
+  446  cd ..
+  447  cd __relaxiation1
+  449  vi relax.f
+  452  f95 -o relax relax.f
+  453  man f95
+  454  f95 --help
+  455  gfortran -Wall -fcheck=all -o relax relax.f
+  456  mv relax.f relax.f95
+  458  vi relax.f95 
+  459  pwd
+  460  emacs relax.f95 
+  461  . .bashrc 
+  462  cd /fs02/ma16/homes/gang/__relaxiation1
+  463  gfortran -Wall -fcheck=all -o relax relax.f95 
+  464  gfortran -Wall -fcheck=all -o relax relax.f95 
+  465  PS1='\[\e[0;36m\]\u@\h:\W\$\[\e[0m\] '
+  466  gfortran -Wall -fcheck=all -o relax relax.f95 
+  467  gfortran -Wall -fcheck=all -o relax relax.f95 
+  468  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  469  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  470  f95 -o relax relax.f95 
+  472  ./relax
+  474  xmgrace correl_O-H1.dat
+  475  vi  relax.f95 
+  476  emacs BOX_VEL 
+  477  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  478  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  479  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  480  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  481  ./relax 
+  482  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  483  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  484  ./relax 
+  486  xmgrace correl_O-H1.dat 
+  487  xmgrace -nxy correl_O-H1.dat 
+  488  xmgrace -nxy correl_O-H1.dat 
+  489  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  490  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  491  ./relax 
+  492  xmgrace -nxy correl_O-H1.dat 
+  493  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  494  ./relax 
+  495  xmgrace -nxy correl_O-H1.dat 
+  496  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  497  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  498  gfortran -Wall -Wextra -fcheck=all -o relax relax.f95 
+  499  ./relax 
+  500  xmgrace -nxy correl_O-H1.dat 
+  502  source .bashrc
+  504  cd __relaxiation1
+  506  cp relax.f95 relax_0.f95
+  508  vi relax.f95 
+  509  history > history_gfortran.dat

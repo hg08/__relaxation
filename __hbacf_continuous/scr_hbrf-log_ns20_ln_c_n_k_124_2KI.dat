@@ -1,0 +1,51 @@
+#=======
+#setting
+#=======
+load '~/bin/hbacf_template.gnuplot'
+set output "124_2KI_ns20_ln_c_n_k.eps"
+set size square 1.15, 1.5
+set multiplot
+
+#set logscale y
+#set logscale x 
+set xrange [1 : 10]
+set yrange [-4 : -1]  
+set xtics 2
+#set mxtics 2 
+set ytics 1
+#set mytics 2
+#set format y "10^{%T}" 
+#set style line 1000 lt 1 lw 2 lc rgb '#000000' # Black solid
+
+# plot 1
+set origin 0, 0 
+set size 1.15, 1.5
+#set key at 9.5, -3.5 
+# set xlabel "{/Symbol n} (cm^{-1})" 
+set border 1+2+4+8
+set xlabel "{t (ps)" font "Sans, 36"
+#set ylabel "k(t) (ps^{-1})" font "Sans,36"
+f(x)=0
+#h(x) = 0.177*exp(-0.177*x)
+#g(x) = k*exp(-k*x-k1*x)
+#g(x) = k_0*exp(-k*x)
+#fit [0.3:10] g(x) '124_2LiI_PBC_ns10_rfachb_h_17.dat' u 1:2  via k_0,k
+plot [1:10] f(x) w l ls 2 notitle,\
+     '124_2KI_PBC_ns20_fitted_c_n_rf.dat' u 1:5 w l ls 7 title "ln[k(t)]",\
+     '124_2KI_PBC_ns20_fitted_c_n_rf.dat' u 1:6 w l ls 83 title "ln[kc(t)-k'n(t)]" # k=0.315; k'=0.025
+## plot 2
+#set origin 0.55, 0.9 
+#set size 0.54, 0.5
+#set border 1+2+4+8
+#set xrange [1 : 30]
+#set yrange [0.001 : 0.05]  
+#set xtics 10 
+#unset xlabel 
+#unset ylabel 
+#g(x) = k*exp(-k*x-k1*x)
+#fit [0.3:10] g(x) 'test_ns200_rfachb_h_17.dat' u 1:2  via k,k1
+#plot "test_ns200_rfachb_h_17.dat" u 1:2 w l ls 7 notitle,\
+#      g(x) w l ls 10 notitle 
+
+unset multiplot
+set output 

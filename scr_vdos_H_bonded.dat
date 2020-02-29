@@ -1,0 +1,28 @@
+#comparing VDOS ofi Hydrogen bonds in NO3-3wat
+set term postscript eps color solid linewidth 1 "Helvetica" 20 enhanced
+set key font "Courier,15"
+#set xlabel font "Courier,15"
+set xlabel font "Time-Roman,15"
+set output "vdos-H-bonded_NO3-3wat.eps"
+set xlabel "k/ cm^{-1}"
+set xrange [ 0 : 4000 ]
+#set xtics font "Courier,15"
+set xtics font "Time-Roman,15"
+#
+set ylabel "" 
+#set yrange [-0.00001:0.00050]
+#set ytics font "Courier,15"
+set ytics font "Time-Roman,15"
+#set format y "%t*10^{%S}" 
+#set format y "%e"
+set format y "%g"
+#
+set title "VDOS of H atoms bonded by O atoms in NO3^-(H_2O)_3(symmetric)" 
+#set title font "Courier,16"
+set title font "Time-Roman,16"
+plot [3000:4000] "sp_NO3-3w_2_H6.dat" u 1:2 w l lw 1 title "Hydrogen 6",\
+                 "sp_NO3-3w_2_H9.dat" u 1:2 w l lw 1 title "Hydrogen 9",\
+                 "sp_NO3-3w_2_H12.dat" u 1:2 w l lw 1 title "Hydrogen 12"
+ set output 
+ set term wxt
+

@@ -1,0 +1,168 @@
+#
+set term postscript eps color solid linewidth 2 "Sans" 20 enhanced
+load '~/bin/hbacf_template_4fig.gnuplot'
+set output "rfhb-log_4.eps"
+#set size square 2.3, 3.0
+
+#==========
+#line types
+#==========
+#Parameters
+#==========
+mpl_top    = 0.1 #inch  outer top margin, title goes here
+mpl_bot    = 0.3 #inch  outer bottom margin, x label goes here
+mpl_left   = 0.4 #inch  outer left margin, y label goes here
+mpl_right  = 0.2 #inch  outer right margin, y2 label goes here
+mpl_height = 0.85 #inch  height of individual plots
+mpl_width  = 0.85 #inch  width of individual plots
+mpl_dx     = -0.01 #inch  inter-plot horizontal spacing
+mpl_dy     = 0.16 #inch  inter-plot vertical spacing
+mpl_ny     = 2   #number of rows
+mpl_nx     = 2   #number of columns
+
+# calculate full dimensions
+xsize = mpl_left+mpl_right+(mpl_width*mpl_nx)+(mpl_nx-1)*mpl_dx
+ysize = mpl_top+mpl_bot+(mpl_ny*mpl_height)+(mpl_ny-1)*mpl_dy
+
+# placement functions
+#   rows are numbered from bottom to top
+bot(n) = (mpl_bot+(n-1)*mpl_height+(n-1)*mpl_dy)/ysize
+top(n)  = 1-((mpl_top+(mpl_ny-n)*(mpl_height+mpl_dy))/ysize)
+#   columns are numbered from left to right
+left(n) = (mpl_left+(n-1)*mpl_width+(n-1)*mpl_dx)/xsize
+right(n)  = 1-((mpl_right+(mpl_nx-n)*(mpl_width+mpl_dx))/xsize)
+
+set output "hbrf_4pl.eps"
+set offsets
+set autoscale fix
+set size 1
+# define x-axis settings for all subplots
+set logscale y 
+set xrange [0.01:10]
+#set xlabel ''
+set format y '10^{%L}'
+set yrange [0.002 : 0.3]
+set xtics  2 
+#================
+#Starting ploting
+#================
+set multiplot
+
+#-----------------------------------------------
+# subplot  1-1(hang)
+#  set horizontal margins for first column
+set lmargin at screen left(1)
+set rmargin at screen right(1)
+#  set horizontal margins for first row (bottom)
+set tmargin at screen top(1)
+set bmargin at screen bot(1)
+
+#set title 'I^--shell'
+# now set a label and tic marks for the x-axis
+set label 1 "(c)" at 0.05, 0.22
+set xlabel "t (ps)"
+set xtics add ("0" 0.01, "2" 2,"4" 4, "6" 6, "8" 8, "10" 10)
+
+#set format y "%-1.0f"
+#set ytics 1
+#set mytics 2
+set xrange [0.01 : 10]
+
+#set arrow 1 from graph 0, first 0 rto graph 1,0 nohead ls 2 
+#set arrow 2 from first 0, graph 0 rto 0, graph 1 nohead ls 2
+
+set border 1+2+4+8
+set xlabel "{t (ps)" 
+set ylabel "k(t) (ps^{-1})" 
+plot "/home/gang/Github/__124_2NaI/__hbrf_layering/rf_l6.dat" u 1:2 w l ls 7 title "2 \305",\
+     "/home/gang/Github/__124_2NaI/__hbrf_layering/rf_l7.dat" u 1:2 w l ls 2 title "3 \305",\
+     "/home/gang/Github/__124_2NaI/__hbrf_layering/rf_l8.dat" u 1:2 w l ls 24 title "4 \305",\
+     "/home/gang/Github/__124_2NaI/__hbrf_layering/rf_l9.dat" u 1:2 w l ls 1 title "5 \305"
+;
+
+#-----------------------------------------------
+# subplot  2-1
+#  set horizontal margins for second colume
+set lmargin at screen left(2)
+set rmargin at screen right(2)
+#  set horizontal margins for first row (bottom)
+set tmargin at screen top(1)
+set bmargin at screen bot(1)
+
+#set title 'K^+-shell'
+set xtics add ("0" 0.01, "2" 2,"4" 4, "6" 6, "8" 8, "10" 10)
+set ylabel ""             # no label here
+#set yrange [-3:0]
+#set format y ""           # no tic labels
+#set ytics mirror 1
+#set ytics 1 
+#set mytics 2 
+set label 1 "(d)" at 0.05, 0.22
+#set arrow 1 from graph 0, first 0 rto graph 1,0 nohead ls 2 
+#set arrow 2 from first 0, graph 0 rto 0, graph 1 nohead ls 2
+plot "rf_l6.dat" u 1:2 w l ls 7 title "2 \305",\
+     "rf_l7.dat" u 1:2 w l ls 2 title "3 \305",\
+     "rf_l8.dat" u 1:2 w l ls 24 title "4 \305",\
+     "rf_l9.dat" u 1:2 w l ls 1 title "5 \305"
+;
+
+#-----------------------------------------------
+# subplot  2-1(hang)
+#  set horizontal margins for first column
+set lmargin at screen left(1)
+set rmargin at screen right(1)
+#  set horizontal margins for first row (bottom)
+set tmargin at screen top(2)
+set bmargin at screen bot(2)
+
+#set title 'I^--shell'
+# now set a label and tic marks for the x-axis
+set xtics add ("0" 0.01, "2" 2,"4" 4, "6" 6, "8" 8, "10" 10)
+unset xlabel 
+
+#set format y "%-1.0f"
+#set ytics 1
+#set mytics 2
+set xrange [0.01 : 10]
+set label 1 "(a)" at 0.05, 0.22
+
+#set arrow 1 from graph 0, first 0 rto graph 1,0 nohead ls 2 
+#set arrow 2 from first 0, graph 0 rto 0, graph 1 nohead ls 2
+
+set border 1+2+4+8
+set ylabel "k(t) (ps^{-1})" 
+plot "/home/gang/Github/__121_pure_330k/__hbrf_layering/rf_l6.dat" u 1:2 w l ls 7 title "2 \305",\
+     "/home/gang/Github/__121_pure_330k/__hbrf_layering/rf_l7.dat" u 1:2 w l ls 2 title "3 \305",\
+     "/home/gang/Github/__121_pure_330k/__hbrf_layering/rf_l8.dat" u 1:2 w l ls 24 title "4 \305",\
+     "/home/gang/Github/__121_pure_330k/__hbrf_layering/rf_l9.dat" u 1:2 w l ls 1 title "5 \305"
+;
+#-----------------------------------------------
+# subplot  2-2
+#  set horizontal margins for second colume
+set lmargin at screen left(2)
+set rmargin at screen right(2)
+#  set horizontal margins for first row (bottom)
+set tmargin at screen top(2)
+set bmargin at screen bot(2)
+
+#set title 'K^+-shell'
+set xtics add ("0" 0.01, "2" 2,"4" 4, "6" 6, "8" 8, "10" 10)
+unset xlabel
+set ylabel ""             # no label here
+#set yrange [-3:0]
+#set format y ""           # no tic labels
+#set ytics mirror 1
+set label 1 "(b)" at 0.05, 0.22
+#set arrow 1 from graph 0, first 0 rto graph 1,0 nohead ls 2 
+#set arrow 2 from first 0, graph 0 rto 0, graph 1 nohead ls 2
+plot "/home/gang/Github/__124_2LiI/__hbrf_layering/rf_l6.dat" u 1:2 w l ls 7 title "2 \305",\
+     "/home/gang/Github/__124_2LiI/__hbrf_layering/rf_l7.dat" u 1:2 w l ls 2 title "3 \305",\
+     "/home/gang/Github/__124_2LiI/__hbrf_layering/rf_l8.dat" u 1:2 w l ls 24 title "4 \305",\
+     "/home/gang/Github/__124_2LiI/__hbrf_layering/rf_l9.dat" u 1:2 w l ls 1 title "5 \305"
+;
+#=====
+#unset
+#=====
+unset multiplot
+set output 
+set term wxt

@@ -1,0 +1,39 @@
+#=======
+#setting
+#=======
+load '~/bin/hbacf_template.gnuplot'
+set output "124_2KI_rfhb-log.eps"
+set size square 1.15, 1.5
+set multiplot
+
+set logscale y
+#set logscale x 
+set xrange [0.01 : 10]
+set yrange [0.01 : 1.0]  
+set xtics 2 
+#set mxtics 2 
+#set ytics 2 
+#set mytics 2
+#set format y "10^{%T}" 
+#set style line 1000 lt 1 lw 2 lc rgb '#000000' # Black solid
+
+# plot 1
+set origin 0, 0 
+set size 1.15, 1.5
+# set key at 4.5, 1 
+# set xlabel "{/Symbol n} (cm^{-1})" 
+set border 1+2+4+8
+set xlabel "{t (ps)" font "Sans, 36"
+set ylabel "k(t) (ps^{-1})" font "Sans,36"
+set label "0" font "Sans,36" at 0.01,0.00157
+f(x)=0
+#h(x) = 0.177*exp(-0.177*x)
+#g(x) = k*exp(-k*x-k1*x)
+#fit [0.3:10] g(x) 'rf_l8.dat' u 1:2  via k,k1
+plot f(x) w l ls 2 notitle,\
+     "124_2KI_salty_ns20_l6_rf.dat" u 1:2 w l ls 7 title "2 \305",\
+     "124_2KI_salty_ns20_l7_rf.dat" u 1:2 w l ls 2 title "3 \305",\
+     "124_2KI_salty_ns20_l8_rf.dat" u 1:2 w l ls 24 title "4 \305",\
+     "124_2KI_salty_ns20_l9_rf.dat" u 1:2 w l ls 1 title "5 \305"
+unset multiplot
+set output 

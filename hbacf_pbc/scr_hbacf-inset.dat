@@ -1,0 +1,66 @@
+set term postscript eps color solid linewidth 2 "Sans" 40 enhanced
+set output "hbacf_pbc.eps"
+set encoding iso_8859_1 #
+set size square 1.15, 1.5
+set multiplot
+
+set xrange [0 : 10]
+set style line 1000 lt 1 lw 2 lc rgb '#000000' # Black solid
+set style line 1 lt 1 lw 2 lc rgb '#000000' # Black solid
+set style line 2 lt 0 lw 2 lc rgb '#000000' # Black dotted
+set style line 3 lt 1 lw 2 lc rgb '#ff0000' # Red
+set style line 4 lt 0 lw 2 lc rgb '#ff0000' # Red
+set style line 5 lt 1 lw 2 lc rgb '#008000' # Green
+set style line 6 lt 0 lw 2 lc rgb '#008000' # Green
+set style line 7 lt 1 lw 2 lc rgb '#0000ff' # Blue
+set style line 8 lt 0 lw 2 lc rgb '#0000ff' # Blue
+set style line 9 lt 1 lw 2 lc rgb '#FFA500' # Orange - #FFA500
+set style line 10 lt 0 lw 2 lc rgb '#FFA500' # Orange - #FFA500
+set style line 11 lt 1 lw 2 lc rgb '#40E0D0' # Turquoise - #40E0D0
+set style line 12 lt 0 lw 2 lc rgb '#40E0D0' # Turquoise - #40E0D0
+set style line 13 lt 1 lw 2 lc rgb '#EE82EE' # Violet - #EE82EE
+set style line 14 lt 0 lw 2 lc rgb '#EE82EE' # Violet - #EE82EE
+set style line 15 lt 1 lw 2 lc rgb '#800000' # Maroon - #800000
+set style line 16 lt 0 lw 2 lc rgb '#800000' # Maroon - #800000
+set style line 17 lt 1 lw 2 lc rgb '#00aaff'
+set style line 18 lt 0 lw 2 lc rgb '#00aaff'
+set style line 90 lt 0 lc rgb '#00ffaa'
+set style line 100 lt 1 lc rgb '#00ff00'
+set style line 110 lt 1 lc rgb '#aaff00'
+set style line 120 lt 1 lc rgb '#ffff00'
+set style line 130 lt 1 lc rgb '#ffaa00'
+set style line 140 lt 1 lc rgb '#ff5500'
+set style line 150 lt 1 lc rgb '#ff0000'
+set style line 300 lt 0 lc rgb '#00FF00' # Yellow - #FFFF00
+
+# plot 1
+set origin 0, 0 
+set key at 8, 0.2
+set xtics 2 
+set mxtics 2
+set ytics 0.2
+set mytics 2
+# set xlabel "{/Symbol n} (cm^{-1})" font "Times-New-Roman, 36"
+set border 1+2+4+8
+set xlabel "{t (ps)"
+set ylabel "C_{HB}(t)"
+set yrange [0: 1.0]  
+plot "xxxx_pbc_hbacf_h.dat" u 1:2 w l ls 7 title "pbc" ,\
+     "xxxx_hbacf_h.dat" u 1:2 w l ls 10 notitle
+
+#plot 2 
+set origin 0.4, 0.75 
+set size 0.8,0.7
+unset ylabel
+unset xlabel
+unset key
+set xtics 0.1
+# set mxtics 2
+set ytics 0.1
+set border 1+2+4+8
+set xrange [0 :0.2]
+set yrange [0.6 : 1.00]   
+plot "xxxx_pbc_hbacf_h.dat" u 1:2 w l ls 7 notitle,\
+     "xxxx_hbacf_h.dat" u 1:2 w l ls 10 notitle
+unset multiplot
+set output 
